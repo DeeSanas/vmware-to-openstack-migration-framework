@@ -4,21 +4,19 @@
 [![OpenStack](https://img.shields.io/badge/Target-OpenStack-ED1944?logo=openstack&logoColor=white)](#)
 [![Python](https://img.shields.io/badge/Toolkit-Python-3776AB?logo=python&logoColor=white)](#)
 
-A structured **assessment and migration-planning framework** for moving suitable virtual-machine workloads from VMware-based environments to OpenStack/KVM.
+A structured **assessment and migration-planning framework** for moving suitable virtual-machine workloads from VMware-based environments to OpenStack/KVM, extended with a dedicated database-cloud-migration architecture project.
 
-The project focuses on discovery, workload classification, dependency mapping, compatibility analysis, target design, migration-wave planning, validation, rollback and operational transition. It deliberately avoids implying that VM conversion alone constitutes a successful migration.
-
-> **Positioning:** This is a reference migration framework and portfolio lab. It is not a claim that every VMware workload can be moved directly to OpenStack, and it is not evidence of a particular customer migration. Each workload requires technical and business validation.
+> **Positioning:** These are reference migration frameworks and portfolio labs. They do not imply that every VMware workload or database can be migrated directly to a new platform. Each workload requires technical, business, licensing and support validation.
 
 ## Migration principles
 
-1. **Discover before designing.** Inventory compute, storage, network, OS, application, dependencies, backup, licensing and operational requirements.
-2. **Classify workloads.** Not every VM should follow the same migration method.
-3. **Design the target first.** OpenStack networking, storage, identity, images, flavors, quotas, availability zones and operations must be ready before bulk migration.
-4. **Migrate in waves.** Start with representative low-risk workloads and use lessons learned to refine later waves.
-5. **Define rollback before cutover.** Rollback is a designed path with data-consistency implications, not an improvised decision during an outage.
-6. **Validate business service, not only VM boot.** Application, data, integrations, monitoring, backup and security must pass acceptance criteria.
-7. **Complete operational handover.** Monitoring, patching, backup, incident response and ownership must work on the target platform.
+1. **Discover before designing.** Inventory compute, storage, network, OS, application, database, dependencies, backup, licensing and operational requirements.
+2. **Classify workloads.** Not every VM or database should follow the same migration method.
+3. **Design the target first.** Networking, storage, identity, images, flavors, database services, HA and operations must be ready before bulk migration.
+4. **Migrate in waves.** Start with representative low-risk workloads.
+5. **Define rollback before cutover.** Rollback requires protected source state and data-consistency rules.
+6. **Validate business service, not only VM boot.** Application, data, integrations, monitoring and backup must pass acceptance criteria.
+7. **Complete operational handover.** Monitoring, patching, backup, incident response and ownership must work on the target.
 
 ## End-to-end methodology
 
@@ -30,7 +28,6 @@ flowchart LR
   D --> E[5. Migration Waves]
   E --> F[6. Validate]
   F --> G[7. Optimize & Handover]
-
   B --> R[Risk / Dependency Register]
   C --> R
   D --> R
@@ -39,55 +36,59 @@ flowchart LR
 
 ## Workload disposition
 
-A VMware inventory should not automatically become an equal-sized OpenStack inventory. Each workload can be assigned a disposition such as:
-
 | Disposition | Meaning |
 |---|---|
-| Rehost | Move the VM with minimal application change where compatible |
-| Replatform | Adjust OS, storage, network, middleware or deployment method for the target platform |
-| Refactor | Redesign application components where business value justifies it |
-| Retain | Keep on VMware/on-prem for dependency, support, licensing or risk reasons |
-| Retire | Decommission obsolete or duplicate workload |
-| Replace | Move capability to another product/SaaS/platform instead of migrating the VM |
+| Rehost | Move workload with minimal application change where compatible |
+| Replatform | Adjust OS, storage, network, middleware or service model |
+| Refactor | Redesign application/data components where value justifies it |
+| Retain | Keep on current platform for dependency, support, licensing or risk reasons |
+| Retire | Decommission obsolete workload |
+| Replace | Move capability to another product/SaaS/platform |
 
 ## Assessment dimensions
 
-### Compute
+### Compute and virtualization
 
 - vCPU/RAM utilization rather than configured values only;
 - CPU pinning/NUMA/huge-page requirements;
-- virtual hardware dependencies;
 - GPU/accelerator needs;
 - unsupported guest OS or drivers.
 
-### Storage
+### Storage and data
 
-- VMDK layout and total used data;
+- VMDK/data volume and growth;
 - performance/latency profile;
-- shared-disk or clustering dependencies;
-- snapshot/backup behavior;
-- target Cinder/Ceph/SAN capabilities;
-- migration data-transfer duration.
+- shared disk or clustering dependencies;
+- backup/snapshot behavior;
+- target Cinder/Ceph/SAN or database storage capabilities;
+- migration transfer duration and change rate.
 
-### Network
+### Network and integrations
 
-- source VLAN/port-group mapping;
+- VLAN/port-group mapping;
 - IP preservation versus re-addressing;
 - firewall/security policy;
-- load balancers and NAT;
-- DNS dependencies;
+- load balancers, NAT and DNS;
 - east-west application dependencies;
-- target Neutron network model.
+- target Neutron/cloud network model.
 
-### Application and operations
+### Application, database and operations
 
-- application owner and criticality;
-- maintenance window;
+- owner and criticality;
+- maintenance window and downtime tolerance;
 - RTO/RPO;
 - upstream/downstream dependencies;
-- licensing/support implications;
+- database engine/version/licensing;
 - monitoring, backup and patching;
 - acceptance test and rollback owner.
+
+## Portfolio projects in this repository
+
+### [VMware to OpenStack Migration Framework](.)
+VM discovery, target assessment, migration-wave planning, rollback and operational transition with inventory templates and a deterministic readiness-reporting script.
+
+### [Database Cloud Migration Architecture](projects/database-cloud-migration-architecture)
+Database-focused migration framework covering engine/version discovery, performance baseline, migration-path selection, replication/CDC, target HA/DR, cutover, validation, rollback and a Python inventory assessor.
 
 ## Repository structure
 
@@ -95,56 +96,41 @@ A VMware inventory should not automatically become an equal-sized OpenStack inve
 .
 ├── README.md
 ├── docs/
-│   ├── methodology.md
-│   ├── discovery-questionnaire.md
-│   └── decision-matrix.md
 ├── templates/
-│   ├── workload-inventory.csv
-│   └── wave-plan.csv
 ├── scripts/
-│   └── readiness_report.py
-└── .github/workflows/python.yml
+├── projects/
+│   └── database-cloud-migration-architecture/
+└── .github/workflows/
 ```
-
-## Readiness toolkit
-
-The Python script performs a simple, transparent quality check on the workload inventory:
-
-```bash
-python scripts/readiness_report.py templates/workload-inventory.csv
-```
-
-It reports missing required data and summarizes migration dispositions/risk flags. The tool is intentionally deterministic and does not claim to replace engineering assessment.
 
 ## Migration-wave criteria
 
-Prefer pilot/early waves that have:
+Prefer early waves with:
 
 - known owners;
 - complete dependency information;
-- supported OS/application stack;
-- manageable data size;
+- supported OS/application/database stack;
+- manageable data size/change rate;
 - clear maintenance window;
 - straightforward rollback;
-- measurable acceptance test;
+- measurable acceptance tests;
 - low blast radius.
 
-Later waves can address higher criticality, larger data sets, complex integrations or special performance requirements after the target platform and process are proven.
+Later waves can address higher criticality, larger data sets, complex integrations and special performance requirements after the target platform and migration process are proven.
 
 ## Cutover acceptance
 
-A workload is not complete merely because the instance starts. Validate:
+Validate:
 
-- boot and OS health;
-- application service health;
-- database/data integrity where applicable;
-- DNS and network reachability;
+- OS/application/database health;
+- data integrity and engine-appropriate consistency;
+- DNS/network reachability;
 - firewall/security controls;
-- integration endpoints;
+- integrations and scheduled jobs;
 - monitoring/logging;
 - backup/recovery;
 - performance baseline;
-- application-owner acceptance.
+- application/data owner acceptance.
 
 ## Related projects
 
@@ -154,12 +140,11 @@ A workload is not complete merely because the instance starts. Validate:
 
 ## Roadmap
 
-- [x] Migration methodology
-- [x] Discovery questionnaire
-- [x] Workload and wave templates
-- [x] Readiness reporting script
-- [x] CI check for Python toolkit
-- [ ] Add sample anonymized assessment dataset
-- [ ] Add target flavor-mapping helper
-- [ ] Add migration duration estimator
-- [ ] Add cutover/rollback runbook template
+- [x] VMware/OpenStack migration methodology
+- [x] Discovery questionnaire and workload/wave templates
+- [x] Readiness reporting script and CI
+- [x] Database cloud migration architecture
+- [x] Database migration inventory assessor and CI
+- [ ] Add anonymized assessment data sets
+- [ ] Add target flavor mapping and migration duration estimator
+- [ ] Add cutover/rollback runbook templates
