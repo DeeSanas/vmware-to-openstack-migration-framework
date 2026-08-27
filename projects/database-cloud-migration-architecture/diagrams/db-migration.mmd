@@ -1,0 +1,15 @@
+flowchart LR
+  SRC[(Source Database)] --> DISC[Discovery / Assessment]
+  DISC --> TARGET[Target Database Platform]
+  SRC --> SNAP[Backup / Snapshot / Export]
+  SRC --> REP[CDC / Replication]
+  SNAP --> TARGET
+  REP --> TARGET
+  APP[Applications] --> TEST[Compatibility / Integration Test]
+  TARGET --> TEST
+  TEST --> CUT[Cutover]
+  CUT --> DNS[Connection String / DNS / Secrets]
+  DNS --> APP
+  SRC --> RB[Rollback Point]
+  OBS[Monitoring / Performance Baseline] --- SRC
+  OBS --- TARGET
