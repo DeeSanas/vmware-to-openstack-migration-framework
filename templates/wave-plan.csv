@@ -1,0 +1,3 @@
+wave,workload,application,planned_window,migration_method,source_freeze_required,estimated_data_gb,target_project,target_network,acceptance_owner,rollback_trigger,status,notes
+1,web-demo-01,Sample Web Service,TBD,rehost,yes,40,project-dev,app-net,app-team,application acceptance failure,planned,Example row only
+1,db-demo-01,Sample Web Service,TBD,replatform,yes,200,project-dev,data-net,db-team,data integrity or application acceptance failure,planned,Example row only
