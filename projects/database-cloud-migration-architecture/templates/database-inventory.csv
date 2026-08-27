@@ -1,0 +1,4 @@
+database_name,engine,version,size_gb,criticality,rto_minutes,rpo_minutes,max_downtime_minutes,ha_enabled,replication_required,licensing_review,owner
+orders-prod,PostgreSQL,15,480,critical,60,15,30,true,true,false,app-team
+finance-core,Oracle,19c,2100,critical,60,15,15,true,true,true,finance-it
+reporting,MariaDB,10.6,220,standard,240,60,120,false,false,false,data-team
