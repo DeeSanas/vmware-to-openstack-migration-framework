@@ -1,0 +1,4 @@
+vm_name,application,owner,environment,criticality,guest_os,vcpus,ram_gb,used_storage_gb,source_network,ip_change_allowed,rto_hours,rpo_hours,dependencies,disposition,risk_flags,wave,notes
+web-demo-01,Sample Web Service,app-team,dev,low,Ubuntu 24.04,2,4,40,VLAN-DEV,yes,8,24,db-demo-01,rehost,,1,Example row only
+db-demo-01,Sample Web Service,db-team,dev,medium,Ubuntu 24.04,4,16,200,VLAN-DATA,no,4,1,web-demo-01,replatform,ip-preservation,1,Example row only
+legacy-demo-01,Legacy Example,unknown,dev,medium,Legacy OS,2,4,80,VLAN-LEGACY,no,8,24,,retain,unsupported-os;owner-unknown,,Example row only
